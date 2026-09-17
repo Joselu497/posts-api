@@ -65,3 +65,13 @@ async def verify_user_credentials(db: AsyncSession, username: str, password: str
     if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
         return user
     return None
+
+async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
+    '''
+    Retrieve a user from the database by their username.
+    :param username: The username of the user to retrieve.
+    :param db: The asynchronous database session.
+    :return: The User object if found, otherwise None.
+    '''
+    result = await db.execute(select(User).where(User.username == username))
+    return result.scalar_one_or_none()
