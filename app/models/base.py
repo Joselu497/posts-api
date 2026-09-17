@@ -1,6 +1,8 @@
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from app.models.mixins import SoftDeleteMixin, TimestampMixin
+
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -10,6 +12,6 @@ convention = {
     "pk": "pk_%(table_name)s",
 }
 
-class Base(DeclarativeBase):
+class Base(SoftDeleteMixin, TimestampMixin, DeclarativeBase):
     metadata = MetaData(naming_convention=convention)
     id: Mapped[int] = mapped_column(primary_key=True)
