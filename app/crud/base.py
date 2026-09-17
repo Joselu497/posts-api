@@ -1,7 +1,5 @@
 from typing import Type
 
-from alembic.util import status
-from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.base import Base
@@ -46,12 +44,6 @@ async def delete(db: AsyncSession, model: Type[Base], id: int) -> None:
     raise: HTTPException: If the record is not found.
     '''
     obj = await get(db, model, id)
-
-    if obj is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"{model.__name__} with id {id} not found",
-        )
 
     obj.soft_delete()
     await db.commit()

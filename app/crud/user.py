@@ -50,3 +50,28 @@ async def update_user(
     await db.commit()
     await db.refresh(user_obj)
     return user_obj
+
+async def verify_user_credentials(db: AsyncSession, username: str, password: str) -> User | None:
+    '''
+    Verify user credentials for login.
+    :param db: The asynchronous database session.
+    :param username: The username of the user attempting to log in.
+    :param password: The password provided by the user.
+    :return: The User object if credentials are valid, otherwise None.
+    '''
+    result = await db.execute(select(User).where(User.username == username))
+    user = result.scalar_one_or_none()
+
+    if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+        return user
+    return None
+
+async def get_user_by_username(db: AsyncSession, username: str) -> User | None:
+    '''
+    Retrieve a user from the database by their username.
+    :param username: The username of the user to retrieve.
+    :param db: The asynchronous database session.
+    :return: The User object if found, otherwise None.
+    '''
+    result = await db.execute(select(User).where(User.username == username))
+    return result.scalar_one_or_none()
